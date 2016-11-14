@@ -22,7 +22,6 @@ public class SpannableBar extends View
 	private static final float DEFAULT_RADIUS = 8f;
 	private static final int TEXT_SIZE_SP = 12;
 	
-	private Rect textRect;
 	private float scaledDensity;
 	private Paint textPaint;
 	private int color = 0xff74AC23;
@@ -34,37 +33,29 @@ public class SpannableBar extends View
 	private float[] definedRadii = {definedRadius, definedRadius, definedRadius, definedRadius,
 			definedRadius, definedRadius, definedRadius, definedRadius};
 	
-	public SpannableBar(Context context, int columns, int start, int span)
+	public SpannableBar(Context context)
 	{
 		super(context);
 		init(context, null);
-		setColumnCount(columns);
-		set(start, span);
 	}
 	
-	public SpannableBar(Context context, @Nullable AttributeSet attrs, int columns, int start, int span)
+	public SpannableBar(Context context, @Nullable AttributeSet attrs)
 	{
 		super(context, attrs);
 		init(context, attrs);
-		setColumnCount(columns);
-		set(start, span);
 	}
 	
-	public SpannableBar(Context context, @Nullable AttributeSet attrs, int defStyleAttr, int columns, int start, int span)
+	public SpannableBar(Context context, @Nullable AttributeSet attrs, int defStyleAttr)
 	{
 		super(context, attrs, defStyleAttr);
 		init(context, attrs);
-		setColumnCount(columns);
-		set(start, span);
 	}
 	
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
-	public SpannableBar(Context context, @Nullable AttributeSet attrs, int defStyleAttr, int defStyleRes, int columns, int start, int span)
+	public SpannableBar(Context context, @Nullable AttributeSet attrs, int defStyleAttr, int defStyleRes)
 	{
 		super(context, attrs, defStyleAttr, defStyleRes);
 		init(context, attrs);
-		setColumnCount(columns);
-		set(start, span);
 	}
 	
 	private void init(Context context, AttributeSet attrs)
@@ -128,7 +119,7 @@ public class SpannableBar extends View
 	
 	public void setColumnCount(int numColumns)
 	{
-		columns = Math.min(numColumns, 0);
+		columns = numColumns > 0 ? numColumns : 1;
 		requestLayout();
 	}
 	
@@ -142,10 +133,26 @@ public class SpannableBar extends View
 		invalidate();
 	}
 	
+	/**
+	 * Set the desired start and span
+	 * @param start which column to start the bar
+	 * @param span the bar's span
+	 */
 	public void set(int start, int span)
 	{
-		this.start = start;
-		this.span = span;
+		if(start <= columns)
+			this.start = start;
+		else
+		{
+			throw new RuntimeException("'start' cannot be higher than the amount of 'columns'.");
+		}
+		
+		if(span <= (columns - start))
+			this.span = span;
+		else
+		{
+			this.span = columns - start;
+		}
 		invalidate();
 	}
 	
