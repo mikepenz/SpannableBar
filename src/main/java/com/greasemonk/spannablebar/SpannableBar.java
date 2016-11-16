@@ -34,7 +34,7 @@ public class SpannableBar extends View
 			textColor = DEFAULT_TEXT_COLOR,
 			color = DEFAULT_BAR_COLOR;
 	private float scaledDensity, radius;
-	private Paint textPaint;
+	private Paint textPaint, linePaint;
 	private ShapeDrawable drawable;
 	
 	/**
@@ -109,6 +109,11 @@ public class SpannableBar extends View
 		textPaint.setTextSize(scaledDensity * DEFAULT_TEXT_SIZE_SP);
 		textPaint.setTextAlign(Paint.Align.CENTER);
 		textPaint.setTypeface(typeface);
+		
+		linePaint = new Paint();
+		linePaint.setColor(Color.GRAY);
+		linePaint.setAlpha(125);
+		
 		requestLayout();
 	}
 	
@@ -122,6 +127,16 @@ public class SpannableBar extends View
 		
 		if (span > 0)
 		{
+			// Draw the grid for this row
+			// Draw a line along the bottom border
+			canvas.drawLine(0,getHeight(),getWidth(),getHeight(), linePaint);
+			// Draw the columns
+			for(int i = 0; i <= columnCount; i++)
+			{
+				int x = i * colWidth;
+				canvas.drawLine(x, 0, x, getHeight(), linePaint);
+			}
+			
 			drawable.getPaint().setColor(color);
 			
 			final int coordLeft = barPadding + (start * colWidth);
@@ -139,6 +154,9 @@ public class SpannableBar extends View
 			{
 				canvas.drawText(text, textCoordX, textBaselineCoordY, textPaint);
 			}
+			
+			
+			
 		}
 	}
 	
