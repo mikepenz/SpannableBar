@@ -17,21 +17,41 @@ import android.view.View;
  */
 public class SpannableBar extends View
 {
-	private static final int DEFAULT_COLUMN_COUNT = 7;
-	private static final int DEFAULT_PADDING = 10;
-	private static final float DEFAULT_RADIUS = 8f;
-	private static final int TEXT_SIZE_SP = 12;
+	public static final int DEFAULT_START = 0;
+	public static final int DEFAULT_SPAN = 7;
+	public static final int DEFAULT_COLUMN_COUNT = 7; // week view, 7 days
+	public static final int DEFAULT_PADDING = 10;
+	public static final float DEFAULT_RADIUS = 8f;
+	public static final int DEFAULT_BAR_COLOR = Color.LTGRAY;
+	public static final int DEFAULT_TEXT_SIZE_SP = 12;
+	public static final int DEFAULT_TEXT_COLOR = Color.WHITE;
 	
-	private float scaledDensity;
-	private Paint textPaint;
-	private int color = 0xff74AC23;
 	private String text;
-	private int start = 0, span = 7;
+	private int start = DEFAULT_START,
+			span = DEFAULT_SPAN,
+			columnCount = DEFAULT_COLUMN_COUNT,
+			padding = DEFAULT_PADDING,
+			textColor = DEFAULT_TEXT_COLOR,
+			color = DEFAULT_BAR_COLOR;
+	private float scaledDensity, radius;
+	private Paint textPaint;
 	private ShapeDrawable drawable;
-	private int columns = DEFAULT_COLUMN_COUNT;
-	private float definedRadius = DEFAULT_RADIUS;
-	private float[] definedRadii = {definedRadius, definedRadius, definedRadius, definedRadius,
-			definedRadius, definedRadius, definedRadius, definedRadius};
+	
+	/**
+	 * An array of 8 radius values, for the outer roundrect.
+	 * The first two floats are for the top-left corner (remaining pairs correspond clockwise).
+	 * For no rounded corners on the outer rectangle, pass null.
+	 *
+	 * @see <a href="https://developer.android.com/reference/android/graphics/drawable/shapes/RoundRectShape.html">RoundRectShape</a>
+	 */
+	private float[] radii = {
+			radius, radius,
+			radius, radius,
+			radius, radius,
+			radius, radius};
+	
+	
+	//region CONSTRUCTORS
 	
 	public SpannableBar(Context context)
 	{
@@ -58,6 +78,9 @@ public class SpannableBar extends View
 		init(context, attrs);
 	}
 	
+	//endregion
+	
+	
 	private void init(Context context, AttributeSet attrs)
 	{
 		if (attrs != null)
@@ -69,19 +92,21 @@ public class SpannableBar extends View
 			try
 			{
 				text = typedArray.getString(R.styleable.SpannableBar_barText);
-				color = typedArray.getColor(R.styleable.SpannableBar_barColor, Color.LTGRAY);
+				color = typedArray.getColor(R.styleable.SpannableBar_barColor, DEFAULT_BAR_COLOR);
+				padding = typedArray.getLayoutDimension(R.styleable.SpannableBar_barPadding, DEFAULT_PADDING);
+				textColor = typedArray.getColor(R.styleable.SpannableBar_barTextColor, Color.WHITE);
 			} finally
 			{
 				typedArray.recycle();
 			}
 		}
-		drawable = new ShapeDrawable(new RoundRectShape(definedRadii, null, null));
+		drawable = new ShapeDrawable(new RoundRectShape(radii, null, null));
 		scaledDensity = context.getResources().getDisplayMetrics().scaledDensity;
-		Typeface typeface = Typeface.create(Typeface.SANS_SERIF,Typeface.BOLD_ITALIC);
+		Typeface typeface = Typeface.create(Typeface.SANS_SERIF, Typeface.BOLD_ITALIC);
 		
 		textPaint = new Paint();
-		textPaint.setColor(Color.BLACK);
-		textPaint.setTextSize(scaledDensity * TEXT_SIZE_SP);
+		textPaint.setColor(textColor);
+		textPaint.setTextSize(scaledDensity * DEFAULT_TEXT_SIZE_SP);
 		textPaint.setTextAlign(Paint.Align.CENTER);
 		textPaint.setTypeface(typeface);
 		requestLayout();
@@ -92,68 +117,29 @@ public class SpannableBar extends View
 		super.onDraw(canvas);
 		
 		scaledDensity = getContext().getResources().getDisplayMetrics().scaledDensity;
-		final int colWidth = canvas.getWidth() / columns;
-		final int padding = Math.round(DEFAULT_PADDING * scaledDensity);
+		final int colWidth = canvas.getWidth() / columnCount;
+		final int barPadding = Math.round(padding * scaledDensity);
 		
 		if (span > 0)
 		{
 			drawable.getPaint().setColor(color);
 			
-			final int coordLeft = padding + (start * colWidth);
-			final int coordTop = padding;
-			final int coordRight = coordLeft + (span * colWidth) - padding;
-			final int coordBottom = canvas.getHeight() - padding;
+			final int coordLeft = barPadding + (start * colWidth);
+			final int coordTop = barPadding;
+			final int coordRight = coordLeft + (span * colWidth) - barPadding;
+			final int coordBottom = canvas.getHeight() - barPadding;
 			
 			drawable.setBounds(coordLeft, coordTop, coordRight, coordBottom);
 			drawable.draw(canvas);
 			
 			final int textCoordX = coordLeft + (coordRight / 2);
-			final int textBaselineCoordY = (canvas.getHeight() / 2) + (padding / 2);
+			final int textBaselineToCenter = Math.abs(Math.round(((textPaint.descent() + textPaint.ascent()) / 2)));
+			final int textBaselineCoordY = (canvas.getHeight() / 2) + textBaselineToCenter;
 			if (text != null && !text.isEmpty())
 			{
 				canvas.drawText(text, textCoordX, textBaselineCoordY, textPaint);
 			}
 		}
-	}
-	
-	
-	public void setColumnCount(int numColumns)
-	{
-		columns = numColumns > 0 ? numColumns : 1;
-		requestLayout();
-	}
-	
-	/**
-	 * Set the displayed text. The view will automatically be invalidated.
-	 * @param text the text to be displayed
-	 */
-	public void setText(String text)
-	{
-		this.text = text == null ? "" : text;
-		invalidate();
-	}
-	
-	/**
-	 * Set the desired start and span
-	 * @param start which column to start the bar
-	 * @param span the bar's span
-	 */
-	public void set(int start, int span)
-	{
-		if(start <= columns)
-			this.start = start;
-		else
-		{
-			throw new RuntimeException("'start' cannot be higher than the amount of 'columns'.");
-		}
-		
-		if(span <= (columns - start))
-			this.span = span;
-		else
-		{
-			this.span = columns - start;
-		}
-		invalidate();
 	}
 	
 	@Override
@@ -178,14 +164,98 @@ public class SpannableBar extends View
 		else
 			width = desiredWidth;
 		
-		// Meausre height
+		// Measure height
 		if (heightMode == MeasureSpec.EXACTLY)
 			height = heightSize;
 		else if (heightMode == MeasureSpec.AT_MOST)
 			height = Math.min(desiredHeight, heightSize);
 		else
 			height = desiredHeight;
-
+		
 		setMeasuredDimension(width, height);
 	}
+	
+	
+	//region GETTERS & SETTERS
+	
+	/**
+	 * Set the amount of columnCount
+	 *
+	 * @param numColumns the amount of columnCount to set
+	 */
+	public void setColumnCount(int numColumns)
+	{
+		columnCount = numColumns > 0 ? numColumns : 1;
+		requestLayout();
+	}
+	
+	/**
+	 * Set the displayed text. The view will automatically be invalidated.
+	 *
+	 * @param text the text to be displayed
+	 */
+	public void setText(String text)
+	{
+		this.text = text == null ? "" : text;
+		invalidate();
+	}
+	
+	/**
+	 * Set the desired starting column of the bar. Any amount that is higher than the span
+	 * will automatically limit itself to the value of columnCount.
+	 *
+	 * @param start which column to start the bar
+	 */
+	public void setStart(int start)
+	{
+		if (start <= columnCount)
+			this.start = start;
+		else
+			this.start = columnCount;
+		
+		invalidate();
+	}
+	
+	/**
+	 * Set the bar's span.
+	 *
+	 * @param span the span to set the bar to.
+	 */
+	public void setSpan(int span)
+	{
+		if (span <= (columnCount - start))
+			this.span = span;
+		else
+		{
+			this.span = columnCount - start;
+		}
+	}
+	
+	/**
+	 * Set the bar's corner radius
+	 *
+	 * @param radius the radius to set
+	 */
+	public void setRadius(float radius)
+	{
+		this.radius = radius;
+		this.radii = new float[]{
+				radius, radius,
+				radius, radius,
+				radius, radius,
+				radius, radius
+		};
+	}
+	
+	/**
+	 * Set the amount of padding around the bar
+	 *
+	 * @param dp the amount of dp to set the padding to.
+	 */
+	public void setPadding(int dp)
+	{
+		padding = dp;
+	}
+	
+	//endregion
 }
