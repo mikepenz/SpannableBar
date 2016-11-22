@@ -15,19 +15,9 @@ Here you can see a timetable where SpannableBars are used in each row item.
 
 # Installation
 
-In the root of your project, check or update your build.gradle file with the following:
-
-```
-repositories {
-  jcenter()
-  // or mavenCentral()
-}
-```
-( it is also synced with mavenCentral(), however new releases will have a delay of about a day )
-
 Include the following in your build.gradle as a dependency:
 
-```
+```gradle
 dependencies {
   compile 'com.github.greasemonk:spannablebar:1.0.0'
 }
