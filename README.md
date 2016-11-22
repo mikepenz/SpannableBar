@@ -8,6 +8,7 @@ Even if that would work, those views would be too over complicated with a lot of
 
 I decided to create a custom view that does only what I needed it to be.
 
+![example application](https://github.com/GreaseMonk/android-timetable-core/blob/master/images/device-2016-11-16-160822.png) 
 
 # Installation
 
