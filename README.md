@@ -9,6 +9,31 @@ Even if that would work, those views would be too over complicated with a lot of
 I decided to create a custom view that does only what I needed it to be.
 
 
+# Installation
+
+In the root of your project, check or update your build.gradle file with the following:
+
+```
+repositories {
+  jcenter()
+  // or mavenCentral()
+}
+```
+( it is also synced with mavenCentral(), however new releases will have a delay of about a day )
+
+Include the following in your build.gradle as a dependency:
+
+```
+dependencies {
+  compile 'com.github.greasemonk:spannablebar:1.0.0'
+}
+```
+
+If this fails, make sure to check if you have synchronized your local repositories.
+
+In IntelliJ or Android Studio, you can find this under Settings>Build,Execution,Deployment>Build Tools>Maven>Repositories.
+
+
 # Usage
 
 Include the layout in your XML:
@@ -47,27 +72,3 @@ bar.setPadding(int dp)                // Default is DEFAULT_PADDING -> 10 (i thi
 Keep in mind this is an early version, basic functionality is priority in version 1.0.0.
 the bar text size is unintentionally fixed to SpannableBar.DEFAULT_TEXT_SIZE_SP -> 12
 
-
-# Installation
-
-In the root of your project, check or update your build.gradle file with the following:
-
-```
-repositories {
-  jcenter()
-  // or mavenCentral()
-}
-```
-( it is also synced with mavenCentral(), however new releases will have a delay of about a day )
-
-Include the following in your build.gradle as a dependency:
-
-```
-dependencies {
-  compile 'com.github.greasemonk:spannablebar:1.0.0'
-}
-```
-
-If this fails, make sure to check if you have synchronized your local repositories.
-
-In IntelliJ or Android Studio, you can find this under Settings>Build,Execution,Deployment>Build Tools>Maven>Repositories.
