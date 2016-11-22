@@ -8,6 +8,9 @@ Even if that would work, those views would be too over complicated with a lot of
 
 I decided to create a custom view that does only what I needed it to be.
 
+The following example usage is from the [TimeTable](https://github.com/GreaseMonk/android-timetable-core) repository
+Here you can see a timetable where SpannableBars are used in each row item.
+
 ![example application](https://github.com/GreaseMonk/android-timetable-core/blob/master/images/device-2016-11-16-160822.png) 
 
 # Installation
