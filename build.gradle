@@ -1,5 +1,29 @@
 apply plugin: 'com.android.library'
-apply plugin: 'com.github.dcendents.android-maven'
+apply from: 'maven-push.gradle'
+
+ext {
+    bintrayRepo = 'maven'
+    bintrayName = 'spannablebar'
+
+    publishedGroupId = 'com.github.greasemonk'
+    libraryName = 'SpannableBar'
+    artifact = 'spannablebar'
+
+    libraryDescription = 'Part of library android-timetable-core to display time tables for planning time for employees in businesses'
+
+    siteUrl = 'https://github.com/GreaseMonk/SpannableBar'
+    gitUrl = 'https://github.com/GreaseMonk/SpannableBar.git'
+
+    libraryVersion = '1.0.0'
+
+    developerId = 'greasemonk'
+    developerName = 'Wiebe Geertsma'
+    developerEmail = 'e.w.geertsma@gmail.com'
+
+    licenseName = 'The Apache Software License, Version 2.0'
+    licenseUrl = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+    allLicenses = ["Apache-2.0"]
+}
 
 group='com.github.GreaseMonk'
 
@@ -26,6 +50,7 @@ android {
 
 dependencies {
     compile 'com.android.support:appcompat-v7:25.0.0'
+    compile 'com.android.support:support-annotations:25.0.0'
 }
 
 
@@ -36,35 +61,17 @@ buildscript {
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:2.2.2'
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7'
         classpath 'com.github.dcendents:android-maven-gradle-plugin:1.4.1'
     }
 }
 
-// build a jar with source files
-task sourcesJar(type: Jar) {
-    from android.sourceSets.main.java.srcDirs
-    classifier = 'sources'
-}
-
-task javadoc(type: Javadoc) {
-    failOnError  false
-    source = android.sourceSets.main.java.sourceFiles
-    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
-    classpath += configurations.compile
-}
-
-// build a jar with javadoc
-task javadocJar(type: Jar, dependsOn: javadoc) {
-    classifier = 'javadoc'
-    from javadoc.destinationDir
-}
-
-artifacts {
-    archives sourcesJar
-    archives javadocJar
-}
+apply plugin: 'com.github.dcendents.android-maven'
+apply plugin: 'com.jfrog.bintray'
 
 task wrapper(type: Wrapper) {
     gradleVersion = '2.14.1'
 }
 
+apply from: 'https://raw.githubusercontent.com/nuuneoi/JCenter/master/installv1.gradle'
+apply from: 'https://raw.githubusercontent.com/nuuneoi/JCenter/master/bintrayv1.gradle'
